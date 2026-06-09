@@ -406,7 +406,7 @@ function connectWS() {
   ws.onclose = () => { document.getElementById("conn-status").textContent="RECONNECTING"; setTimeout(connectWS,3000); };
   ws.onmessage = e => {
     const m = JSON.parse(e.data);
-    if(m.prices) { Object.assign(prices,m.prices); renderInst(); }
+    if(m.prices) { const s=window.scrollY; Object.assign(prices,m.prices); renderInst(); window.scrollTo(0,s); }
     if(m.signals) { sigs=m.signals; renderSignals(); }
     if(m.total_pnl!==undefined) { totalPnl=m.total_pnl; renderPnl(); }
     if(m.day_pnl!==undefined)   { dayPnl=m.day_pnl; renderPnl(); }
