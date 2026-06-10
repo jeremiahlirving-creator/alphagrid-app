@@ -24,7 +24,6 @@
 html,body{height:100%;overflow:hidden;background:var(--bg)}
 body{font-family:'JetBrains Mono',monospace;color:var(--tx);overscroll-behavior:none}
 
-/* LAYOUT */
 .root{display:flex;flex-direction:column;height:100vh;height:100dvh}
 .nav{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 10px;background:var(--p1);border-bottom:1px solid var(--b1);flex-shrink:0}
 .brand{font-family:'Outfit',sans-serif;font-size:17px;font-weight:800;letter-spacing:-.5px}
@@ -36,16 +35,13 @@ body{font-family:'JetBrains Mono',monospace;color:var(--tx);overscroll-behavior:
 .dot{width:5px;height:5px;border-radius:50%;background:var(--gn);animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,.5)}50%{box-shadow:0 0 0 4px rgba(16,185,129,0)}}
 
-/* TAB BAR */
 .tabbar{display:flex;background:var(--p1);border-bottom:1px solid var(--b1);flex-shrink:0}
 .tab{flex:1;padding:10px 4px 9px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--mt);background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;transition:.15s;letter-spacing:.3px}
 .tab.on{color:var(--gn);border-bottom-color:var(--gn)}
 
-/* SCROLL AREA */
 .scroll{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:12px 14px 24px}
 .scroll::-webkit-scrollbar{display:none}
 
-/* BOT TOGGLE */
 .bot-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
 .bt{background:var(--p1);border:1px solid var(--b1);border-radius:10px;padding:12px;cursor:pointer;transition:.2s;position:relative;overflow:hidden;text-align:left}
 .bt::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;opacity:0;transition:.2s}
@@ -58,12 +54,10 @@ body{font-family:'JetBrains Mono',monospace;color:var(--tx);overscroll-behavior:
 .kz-badge{background:rgba(16,185,129,.15);color:var(--gnt);border:1px solid rgba(16,185,129,.3)}
 .an-badge{background:rgba(139,92,246,.15);color:var(--put);border:1px solid rgba(139,92,246,.3)}
 
-/* PHASE */
 .phase{padding:9px 12px;border-radius:8px;margin-bottom:10px;background:var(--p1);border:1px solid var(--b1);display:flex;justify-content:space-between;align-items:center}
 .phase-l{font-size:11px;font-weight:500}
 .phase-r{font-size:9px;color:var(--mt)}
 
-/* PROP */
 .prop{background:var(--p1);border:1px solid var(--b1);border-radius:10px;padding:12px;margin-bottom:10px}
 .prop-lbl{font-size:7px;color:var(--mt);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px}
 .prop-row{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:10px}
@@ -74,7 +68,6 @@ body{font-family:'JetBrains Mono',monospace;color:var(--tx);overscroll-behavior:
 .prog-bar{height:3px;background:var(--p3);border-radius:2px;overflow:hidden;margin-bottom:5px}
 .prog-fill{height:100%;border-radius:2px;transition:width .5s}
 
-/* INST CARDS */
 .inst-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
 .ic{background:var(--p1);border:1px solid var(--b1);border-radius:9px;padding:12px;cursor:pointer}
 .ic.sel{border-color:var(--b2)}
@@ -89,7 +82,6 @@ body{font-family:'JetBrains Mono',monospace;color:var(--tx);overscroll-behavior:
 .chg{font-size:8px;color:var(--mt);margin-top:1px}
 .cbadge{font-size:8px;color:var(--mt);margin-top:3px}
 
-/* SIGNALS */
 .sig-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
 .sig-lbl{font-size:8px;color:var(--mt);letter-spacing:1.5px;text-transform:uppercase}
 .sbadge{font-size:8px;padding:1px 7px;border-radius:8px;font-weight:700;margin-left:4px}
@@ -123,7 +115,6 @@ body{font-family:'JetBrains Mono',monospace;color:var(--tx);overscroll-behavior:
 .skip-btn{flex:1;background:none;border:1px solid var(--b1);color:var(--mt2);padding:13px;border-radius:8px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:9px;-webkit-appearance:none}
 .skip-btn:active{background:var(--p2)}
 
-/* RISK */
 .risk-panel{background:var(--p1);border:1px solid var(--b1);border-radius:9px;padding:12px;margin-bottom:10px}
 .risk-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
 .rb{background:var(--p2);border:1px solid var(--b1);border-radius:5px;padding:8px 10px}
@@ -134,7 +125,16 @@ body{font-family:'JetBrains Mono',monospace;color:var(--tx);overscroll-behavior:
 .lockout{background:var(--rdb);border:1px solid rgba(239,68,68,.3);border-radius:6px;padding:9px;text-align:center;font-size:9px;color:var(--rdt);font-weight:500;margin-top:8px}
 .revenge{background:var(--amb);border:1px solid rgba(245,158,11,.3);border-radius:6px;padding:8px;font-size:9px;color:var(--amt);margin-top:6px}
 
-/* TRADE LOG */
+/* KILL SWITCHES */
+.ks-panel{background:var(--p1);border:1px solid var(--b1);border-radius:9px;padding:12px;margin-bottom:10px}
+.ks-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.ks-item{background:var(--p2);border:1px solid var(--b1);border-radius:5px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center}
+.ks-item.fired{background:var(--rdb);border-color:rgba(239,68,68,.4)}
+.ks-lbl{font-size:8px;color:var(--mt);text-transform:uppercase;letter-spacing:.5px}
+.ks-item.fired .ks-lbl{color:var(--rdt)}
+.ks-dot{width:6px;height:6px;border-radius:50%;background:var(--p3)}
+.ks-item.fired .ks-dot{background:var(--rd)}
+
 .tlog-wrap{background:var(--p1);border:1px solid var(--b1);border-radius:9px;padding:12px;margin-bottom:10px}
 .tlog{max-height:160px;overflow-y:auto}
 .tlog::-webkit-scrollbar{display:none}
@@ -147,7 +147,6 @@ body{font-family:'JetBrains Mono',monospace;color:var(--tx);overscroll-behavior:
 .t-pnl{font-weight:500;min-width:48px;text-align:right;font-variant-numeric:tabular-nums}
 .t-time{color:var(--mt);font-size:8px;text-align:right}
 
-/* LEVELS TAB */
 .le-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
 .le-box{background:var(--p1);border:1px solid var(--b1);border-radius:10px;padding:12px}
 .le-title{font-family:'Outfit',sans-serif;font-size:12px;font-weight:700;margin-bottom:2px;display:flex;align-items:center;gap:6px}
@@ -170,7 +169,6 @@ body{font-family:'JetBrains Mono',monospace;color:var(--tx);overscroll-behavior:
 .le-btn{flex:1;padding:6px;font-size:9px;border-radius:5px;border:1px solid var(--b1);background:var(--p2);cursor:pointer;color:var(--mt2);font-family:'JetBrains Mono',monospace;-webkit-appearance:none}
 .le-btn:active{background:var(--p3)}
 
-/* DEPLOY */
 .dep-wrap{background:var(--p1);border:1px solid var(--b1);border-radius:10px;padding:14px}
 .dep-lbl{font-size:7px;color:var(--mt);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px}
 .dep-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
@@ -184,7 +182,6 @@ body{font-family:'JetBrains Mono',monospace;color:var(--tx);overscroll-behavior:
 .dep-both:active{background:var(--p3)}
 .dep-log{margin-top:8px;font-size:10px;color:var(--mt);text-align:center;min-height:16px;line-height:1.5}
 
-/* RESET BTN */
 .reset-btn{background:none;border:1px solid var(--b1);color:var(--mt2);padding:4px 10px;border-radius:6px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:9px;-webkit-appearance:none}
 .reset-btn:active{background:var(--p2)}
 
@@ -213,7 +210,6 @@ body{font-family:'JetBrains Mono',monospace;color:var(--tx);overscroll-behavior:
 
   <div class="scroll" id="tab-live">
 
-    <!-- BOT TOGGLE -->
     <div class="bot-row">
       <div class="bt kz" id="bt-killzone" onclick="switchBot('killzone')">
         <span class="bt-badge kz-badge" id="badge-killzone">ACTIVE</span>
@@ -229,13 +225,11 @@ body{font-family:'JetBrains Mono',monospace;color:var(--tx);overscroll-behavior:
       </div>
     </div>
 
-    <!-- PHASE BANNER -->
     <div class="phase" id="phase-banner">
       <div class="phase-l" id="phase-label">Between Sessions</div>
       <div class="phase-r" id="phase-sub">Next: check schedule</div>
     </div>
 
-    <!-- PROP TRACKER -->
     <div class="prop">
       <div class="prop-lbl" id="prop-lbl">ICT Kill Zone · $50K Prop Firm</div>
       <div class="prop-row">
@@ -251,10 +245,8 @@ body{font-family:'JetBrains Mono',monospace;color:var(--tx);overscroll-behavior:
       <div class="prog-bar"><div class="prog-fill" id="dd-bar" style="width:0%;background:var(--gn)"></div></div>
     </div>
 
-    <!-- INSTRUMENT CARDS -->
     <div class="inst-row" id="inst-cards"></div>
 
-    <!-- RISK CONTROLS -->
     <div class="risk-panel">
       <div style="font-size:8px;color:var(--mt);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">Risk Controls</div>
       <div class="risk-grid">
@@ -271,7 +263,12 @@ body{font-family:'JetBrains Mono',monospace;color:var(--tx);overscroll-behavior:
       <div id="revenge-banner" style="display:none" class="revenge"></div>
     </div>
 
-    <!-- SIGNALS -->
+    <!-- KILL SWITCHES -->
+    <div class="ks-panel" id="ks-panel" style="display:none">
+      <div style="font-size:8px;color:var(--mt);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">Kill Switches</div>
+      <div class="ks-grid" id="ks-grid"></div>
+    </div>
+
     <div class="sig-hdr">
       <div class="sig-lbl">Signals<span class="sbadge" id="sig-badge" style="display:none;background:var(--gn);color:#000"></span></div>
       <div style="font-size:8px;color:var(--mt)" id="sig-meta">1 contract · max $500</div>
@@ -280,15 +277,13 @@ body{font-family:'JetBrains Mono',monospace;color:var(--tx);overscroll-behavior:
       <div class="nosig"><div class="nosig-icon">🎯</div>Enter session levels then watch for signals</div>
     </div>
 
-    <!-- TRADE LOG -->
     <div class="tlog-wrap">
       <div style="font-size:8px;color:var(--mt);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">Trade Log</div>
       <div class="tlog" id="trade-log"><div style="text-align:center;padding:12px;color:var(--mt);font-size:9px">No trades today.</div></div>
     </div>
 
-  </div><!-- end tab-live -->
+  </div>
 
-  <!-- LEVEL ENTRY TAB -->
   <div class="scroll" id="tab-levels" style="display:none">
     <div class="le-grid" id="paste-boxes"></div>
     <div class="dep-wrap">
@@ -308,10 +303,9 @@ body{font-family:'JetBrains Mono',monospace;color:var(--tx);overscroll-behavior:
     </div>
   </div>
 
-</div><!-- end root -->
+</div>
 
 <script>
-// ── CONFIG ────────────────────────────────────────────────────────────────────
 const BOTS = {
   killzone: {
     name:"ICT Kill Zone", emoji:"🎯",
@@ -330,12 +324,8 @@ const BOTS = {
 };
 
 const BASE = {ES:7415,NQ:29220,MES:7415,MNQ:29220};
-const PV   = {ES:50,NQ:20,MES:5,MNQ:2};
-const STOP = {ES:10,NQ:20,MES:10,MNQ:20};
-
 const LEVEL_KEYS = ["PDH","PDL","AsiaH","AsiaL","LonH","LonL","PMH","PML","NYOpenH","NYOpenL"];
 const LEVEL_LABELS = {PDH:"PDH",PDL:"PDL",AsiaH:"Asia H",AsiaL:"Asia L",LonH:"Lon H",LonL:"Lon L",PMH:"PM H",PML:"PM L",NYOpenH:"NY Open H",NYOpenL:"NY Open L"};
-const LEVEL_TYPE = {PDH:"res",PDL:"sup",AsiaH:"res",AsiaL:"sup",LonH:"res",LonL:"sup",PMH:"res",PML:"sup",NYOpenH:"neu",NYOpenL:"neu"};
 
 const PARSE_MAP = [
   {key:"PDH",   labels:["pdh","previous day high","prev day high","pd high"]},
@@ -357,16 +347,15 @@ const PASTE_GROUPS = [
    placeholder:"PDH: 30495.00\nPDL: 28781.25\nAsia H: 29287.50\nAsia L: 29082.75\nLon H: 29287.50\nLon L: 28894.50"},
 ];
 
-// ── STATE ─────────────────────────────────────────────────────────────────────
+// STATE — sourced entirely from bot WebSocket, no fake local simulation
 let activeBot = "killzone";
 let prices = {...BASE};
 let levels = {ES:{},NQ:{},MES:{},MNQ:{}};
 let sigs = [], trades = [];
-let totalPnl = 0, dayPnl = 0, tc = 0, wins = 0, locked = false, revMins = 0;
+let totalPnl = 0, dayPnl = 0, tc = 0, wins = 0, losses = 0;
+let locked = false, revMins = 0, killSwitches = {};
 let ws = null, pasteText = {es_mes:"",nq_mnq:""};
-let sigIdCtr = 0, lastSig = {ES:0,NQ:0,MES:0,MNQ:0};
 
-// ── HELPERS ───────────────────────────────────────────────────────────────────
 function getPhase() {
   const est = new Date(new Date().toLocaleString("en-US",{timeZone:"America/New_York"}));
   const m = est.getHours()*60+est.getMinutes();
@@ -397,23 +386,65 @@ function parseText(text) {
   return result;
 }
 
+// ── APPLY STATE FROM BOT ──────────────────────────────────────────────────────
+function applyStats(m) {
+  if(m.total_pnl !== undefined) totalPnl = m.total_pnl;
+  if(m.day_pnl   !== undefined) dayPnl   = m.day_pnl;
+  if(m.trades    !== undefined) tc       = m.trades;
+  if(m.wins      !== undefined) wins     = m.wins;
+  if(m.losses    !== undefined) losses   = m.losses;
+  if(m.locked    !== undefined) locked   = m.locked;
+  if(m.revenge_mins !== undefined) revMins = m.revenge_mins;
+  if(m.kill_switches) killSwitches = m.kill_switches;
+}
+
 // ── WEBSOCKET ─────────────────────────────────────────────────────────────────
 function connectWS() {
   const bot = BOTS[activeBot];
   if(ws) { try{ws.close();}catch(e){} }
   ws = new WebSocket(bot.ws);
-  ws.onopen = () => { document.getElementById("conn-status").textContent="LIVE"; };
-  ws.onclose = () => { document.getElementById("conn-status").textContent="RECONNECTING"; setTimeout(connectWS,3000); };
+  ws.onopen = () => {
+    document.getElementById("conn-status").textContent = "LIVE";
+    // fetch full state on connect to populate trades immediately
+    fetch(bot.api+"/state").then(r=>r.json()).then(data => {
+      if(data.trades) { trades = data.trades; renderTrades(); }
+      applyStats(data);
+      if(data.signals) { sigs = data.signals; renderSignals(); }
+      if(data.prices)  { Object.assign(prices, data.prices); renderInst(); }
+      if(data.session_levels) { Object.assign(levels, data.session_levels); updateLevelCounts(); }
+      renderPnl(); renderRisk(); renderKillSwitches();
+    }).catch(()=>{});
+  };
+  ws.onclose = () => {
+    document.getElementById("conn-status").textContent = "RECONNECTING";
+    setTimeout(connectWS, 3000);
+  };
   ws.onmessage = e => {
     const m = JSON.parse(e.data);
-    if(m.prices) { const s=window.scrollY; Object.assign(prices,m.prices); renderInst(); window.scrollTo(0,s); }
-    if(m.signals) { sigs=m.signals; renderSignals(); }
-    if(m.total_pnl!==undefined) { totalPnl=m.total_pnl; renderPnl(); }
-    if(m.day_pnl!==undefined)   { dayPnl=m.day_pnl; renderPnl(); }
-    if(m.locked!==undefined)    { locked=m.locked; renderRisk(); }
-    if(m.session_levels)        { Object.assign(levels,m.session_levels); updateLevelCounts(); }
-    if(m.revenge_mins!==undefined) { revMins=m.revenge_mins; renderRisk(); }
-    if(m.trades) { trades=m.trades; renderTrades(); }
+    const sy = window.scrollY;
+    // prices
+    if(m.prices) { Object.assign(prices, m.prices); renderInst(); }
+    if(m.price && m.inst) { prices[m.inst] = m.price; renderInst(); }
+    // signals
+    if(m.signals) { sigs = m.signals; renderSignals(); }
+    // trades — real data from bot
+    if(m.trades)  { trades = m.trades; renderTrades(); }
+    // stats block (nested under "stats" key from price broadcast)
+    if(m.stats)   { applyStats(m.stats); renderPnl(); renderRisk(); renderKillSwitches(); }
+    // flat stats keys (from init/state)
+    applyStats(m);
+    if(m.session_levels) { Object.assign(levels, m.session_levels); updateLevelCounts(); }
+    // trade_executed — full refresh
+    if(m.type === "trade_executed") {
+      if(m.trades)  { trades = m.trades; renderTrades(); }
+      if(m.signals) { sigs = m.signals; renderSignals(); }
+      if(m.stats)   { applyStats(m.stats); }
+      renderPnl(); renderRisk(); renderKillSwitches();
+    }
+    if(m.type === "result") {
+      if(m.stats) { applyStats(m.stats); renderPnl(); renderRisk(); renderKillSwitches(); }
+    }
+    window.scrollTo(0, sy);
   };
 }
 
@@ -455,7 +486,7 @@ function renderInst() {
   const bot = BOTS[activeBot];
   const phase = getPhase();
   const isActive = phase==="kill_zone"||(["asia","london"].includes(phase)&&activeBot==="allnight");
-  const html = bot.instruments.map(inst => {
+  document.getElementById("inst-cards").innerHTML = bot.instruments.map(inst => {
     const chg = prices[inst]-BASE[inst], pos = chg>=0;
     const ptag = isActive?(activeBot==="killzone"?"ptag-on":"ptag-pu"):"ptag-off";
     const ptxt = isActive?"ACTIVE":"CLOSED";
@@ -469,7 +500,6 @@ function renderInst() {
       <div class="cbadge">${bot.contracts} contracts</div>
     </div>`;
   }).join("");
-  document.getElementById("inst-cards").innerHTML = html;
 }
 
 function renderPnl() {
@@ -510,6 +540,23 @@ function renderRisk() {
   else rb.style.display="none";
 }
 
+function renderKillSwitches() {
+  const ks = killSwitches;
+  if(!ks || Object.keys(ks).length === 0) {
+    document.getElementById("ks-panel").style.display = "none";
+    return;
+  }
+  const anyFired = Object.values(ks).some(v=>v);
+  document.getElementById("ks-panel").style.display = "";
+  const labels = {daily_cap:"Daily Cap",trailing_dd:"Trailing DD",loss_streak:"Loss Streak",reversal:"Reversal"};
+  document.getElementById("ks-grid").innerHTML = Object.entries(ks).map(([k,v]) =>
+    `<div class="ks-item ${v?"fired":""}">
+      <span class="ks-lbl">${labels[k]||k}</span>
+      <span class="ks-dot"></span>
+    </div>`
+  ).join("");
+}
+
 function renderSignals() {
   const area = document.getElementById("signals-area");
   const badge = document.getElementById("sig-badge");
@@ -523,8 +570,9 @@ function renderSignals() {
   badge.style.display="";badge.textContent=sigs.length;
   area.innerHTML = sigs.map(sig => {
     const cls = sig.direction==="LONG"?"sc-L":"sc-S";
-    const btnTxt = locked?"LOCKED":revMins>0?"COOLDOWN "+Math.ceil(revMins)+"m":sig.direction==="LONG"?"BUY — EXECUTE LONG":"SELL — EXECUTE SHORT";
-    const disabled = (locked||tc>=6||revMins>0)?"disabled":"";
+    const anySwitchFired = Object.values(killSwitches).some(v=>v);
+    const btnTxt = locked?"LOCKED":anySwitchFired?"KILL SWITCH ACTIVE":revMins>0?"COOLDOWN "+Math.ceil(revMins)+"m":sig.direction==="LONG"?"BUY — EXECUTE LONG":"SELL — EXECUTE SHORT";
+    const disabled = (locked||anySwitchFired||revMins>0)?"disabled":"";
     return `<div class="sc ${cls}">
       <div class="sc-top">
         <div class="sc-dir">${sig.direction} ${sig.inst} — ${sig.sweep_level}</div>
@@ -551,16 +599,26 @@ function renderSignals() {
 
 function renderTrades() {
   const el = document.getElementById("trade-log");
-  if(trades.length===0){el.innerHTML='<div style="text-align:center;padding:12px;color:var(--mt);font-size:9px">No trades today.</div>';return;}
-  el.innerHTML=trades.map(t=>`
-    <div class="tr">
-      <span class="ttag ${t.direction==="LONG"?"tL":"tS"}">${t.direction}</span>
-      <span class="ttag ${t.won?"tW":"tX"}">${t.won?"WIN":"LOSS"}</span>
+  if(!trades||trades.length===0){
+    el.innerHTML='<div style="text-align:center;padding:12px;color:var(--mt);font-size:9px">No trades today.</div>';
+    return;
+  }
+  el.innerHTML = trades.map(t => {
+    const isLong = t.direction === "LONG";
+    // trade won/pnl may not be set until /result is called; show EXECUTED status if no pnl yet
+    const hasPnl = t.pnl !== undefined && t.pnl !== null;
+    const pnlDisplay = hasPnl ? (t.pnl >= 0 ? "+$"+Math.abs(t.pnl).toFixed(0) : "-$"+Math.abs(t.pnl).toFixed(0)) : "pending";
+    const pnlClass = hasPnl ? (t.pnl >= 0 ? "up" : "dn") : "";
+    const wonTag = t.won !== undefined ? (t.won ? `<span class="ttag tW">WIN</span>` : `<span class="ttag tX">LOSS</span>`) : `<span class="ttag" style="background:var(--amb);color:var(--amt)">EXEC</span>`;
+    return `<div class="tr">
+      <span class="ttag ${isLong?"tL":"tS"}">${t.direction}</span>
+      ${wonTag}
       <span class="t-inst">${t.inst}</span>
-      <span class="t-lvl">${t.sweep_level}</span>
-      <span class="t-pnl ${t.won?"up":"dn"}">${t.won?"+":"-"}$${t.pnl}</span>
-      <span class="t-time">${t.executed_at}</span>
-    </div>`).join("");
+      <span class="t-lvl">${t.sweep_level||""}</span>
+      <span class="t-pnl ${pnlClass}">${pnlDisplay}</span>
+      <span class="t-time">${t.executed_at||t.time||""}</span>
+    </div>`;
+  }).join("");
 }
 
 // ── LEVEL ENTRY ───────────────────────────────────────────────────────────────
@@ -573,7 +631,6 @@ function buildPasteBoxes() {
         ${isKZ?"🎯":"🌙"} ${inst}
       </span>`;
     }).join("");
-
     const fields = g.instruments.map(inst => {
       const lfields = LEVEL_KEYS.map(k => {
         const val = levels[inst][k];
@@ -589,7 +646,6 @@ function buildPasteBoxes() {
         ${lfields}
       </div>`;
     }).join("");
-
     return `<div class="le-box" style="border-color:${g.color}40">
       <div class="le-title"><span class="le-dot" style="background:${g.color}"></span>${g.label}</div>
       <div class="le-sub">${g.sublabel}</div>
@@ -667,32 +723,19 @@ async function deployToBot(target) {
   setDepLog(results.join(" | "));
   setTimeout(()=>setDepLog(""),8000);
 }
+function setDepLog(msg) { document.getElementById("dep-log").textContent=msg; }
 
-function setDepLog(msg) {
-  document.getElementById("dep-log").textContent=msg;
-}
-
-// ── EXECUTE / DISMISS ─────────────────────────────────────────────────────────
+// ── EXECUTE — calls bot, bot pushes real trade via WebSocket ──────────────────
 async function execute(sigId) {
-  if(locked||tc>=6||revMins>0) return;
+  const anySwitchFired = Object.values(killSwitches).some(v=>v);
+  if(locked||anySwitchFired||revMins>0) return;
   const bot = BOTS[activeBot];
-  const sig = sigs.find(s=>s.id===sigId);
-  if(!sig) return;
   try {
-    const resp = await fetch(bot.api+"/execute/"+sigId,{method:"POST"});
+    const resp = await fetch(bot.api+"/execute/"+sigId);
     const data = await resp.json();
     if(data.success===false) { alert(data.reason||"Execution failed"); return; }
-  } catch(e) { alert("Connection error: "+e.message); return; }
-  // Local tracking
-  const won = Math.random()<.6;
-  const pnl = won?sig.reward_tp1:-sig.risk;
-  totalPnl+=pnl; dayPnl+=pnl; tc++;
-  if(won) wins++; else revMins=30;
-  if(totalPnl<=-1800) locked=true;
-  trades.unshift({...sig,pnl:Math.round(Math.abs(pnl)),won,executed_at:new Date().toLocaleTimeString()});
-  if(trades.length>50) trades.pop();
-  sigs = sigs.filter(s=>s.id!==sigId);
-  renderPnl(); renderRisk(); renderSignals(); renderTrades();
+    // Bot broadcasts trade_executed via WebSocket — dashboard will update automatically
+  } catch(e) { alert("Connection error: "+e.message); }
 }
 
 async function dismiss(sigId) {
@@ -702,38 +745,34 @@ async function dismiss(sigId) {
   renderSignals();
 }
 
-// ── BOT SWITCH ────────────────────────────────────────────────────────────────
 function switchBot(key) {
   activeBot = key;
-  sigs = [];
-  renderBotToggle(); renderInst(); renderSignals(); renderRisk(); renderPnl();
+  sigs = []; trades = [];
+  totalPnl=0;dayPnl=0;tc=0;wins=0;losses=0;locked=false;revMins=0;killSwitches={};
+  renderBotToggle(); renderInst(); renderSignals(); renderRisk(); renderPnl(); renderTrades(); renderKillSwitches();
   connectWS();
 }
 
-// ── TAB SWITCH ────────────────────────────────────────────────────────────────
 function showTab(name, btn) {
-  document.getElementById("tab-live").style.display  = name==="live"?"":"none";
+  document.getElementById("tab-live").style.display   = name==="live"?"":"none";
   document.getElementById("tab-levels").style.display = name==="levels"?"":"none";
   document.querySelectorAll(".tab").forEach(t=>t.classList.remove("on"));
   btn.classList.add("on");
   if(name==="levels") buildPasteBoxes();
 }
 
-// ── RESET ─────────────────────────────────────────────────────────────────────
 function resetDay() {
-  totalPnl=0;dayPnl=0;tc=0;wins=0;locked=false;revMins=0;sigs=[];trades=[];
+  totalPnl=0;dayPnl=0;tc=0;wins=0;losses=0;locked=false;revMins=0;sigs=[];trades=[];killSwitches={};
   fetch(BOTS[activeBot].api+"/reset_day",{method:"POST"}).catch(()=>{});
-  renderPnl(); renderRisk(); renderSignals(); renderTrades();
+  renderPnl(); renderRisk(); renderSignals(); renderTrades(); renderKillSwitches();
 }
 
-// ── CLOCK + PHASE LOOP ────────────────────────────────────────────────────────
 setInterval(()=>{
   document.getElementById("clock").textContent=getESTTime()+" EST";
   renderPhase();
   if(revMins>0){ revMins=Math.max(0,revMins-1/60); renderRisk(); }
 }, 1000);
 
-// ── INIT ─────────────────────────────────────────────────────────────────────
 renderBotToggle();
 renderInst();
 renderPhase();
@@ -741,6 +780,7 @@ renderPnl();
 renderRisk();
 renderSignals();
 renderTrades();
+renderKillSwitches();
 connectWS();
 </script>
 </body>
