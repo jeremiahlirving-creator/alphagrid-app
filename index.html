@@ -1,34 +1,890 @@
-Building it now. This will be a standalone FastAPI service that monitors all 3 bots and sends you intelligent daily reports.Now create the supporting files:4 files ready. Here's how to deploy:
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AlphaGrid">
+<title>AlphaGrid</title>
+<style>
+:root {
+  --bg:      #090c12;
+  --surface: #111520;
+  --border:  #1c2235;
+  --accent:  #00e5ff;
+  --green:   #00e676;
+  --red:     #ff1744;
+  --yellow:  #ffd600;
+  --text:    #e8eaf0;
+  --muted:   #3d4560;
+  --pdh:     #ff5252;
+  --asia:    #ffd600;
+  --lon:     #00e5ff;
+  --orb:     #b388ff;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+  font-size: 14px;
+  padding-bottom: 72px;
+}
+.hdr {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 16px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+}
+.logo { font-size: 17px; font-weight: 800; letter-spacing: .1em; color: var(--accent); }
+.logo span { color: var(--muted); font-weight: 400; }
+.time { font-size: 11px; color: var(--muted); }
+.tabs {
+  display: flex; background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 45px; z-index: 99;
+  overflow-x: auto;
+}
+.tab {
+  flex-shrink: 0;
+  padding: 11px 12px; text-align: center;
+  font-size: 11px; font-weight: 700; letter-spacing: .07em;
+  color: var(--muted); cursor: pointer;
+  border-bottom: 2px solid transparent; transition: all .2s;
+  white-space: nowrap;
+}
+.tab.on { color: var(--accent); border-bottom-color: var(--accent); }
+.panel { display: none; padding: 14px; }
+.panel.on { display: block; }
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 13px 14px; margin-bottom: 11px;
+}
+.card.orb-card { border-color: rgba(179,136,255,.2); }
+.card.fvg-card { border-color: rgba(0,230,118,.15); }
+.ctitle {
+  font-size: 9px; font-weight: 800; letter-spacing: .12em;
+  color: var(--muted); text-transform: uppercase; margin-bottom: 10px;
+}
+.ctitle .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+/* BOT STATUS ROW */
+.bot-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 0; border-bottom: 1px solid var(--border);
+}
+.bot-row:last-child { border-bottom: none; }
+.bot-name { font-size: 13px; font-weight: 700; }
+.bot-sub  { font-size: 10px; color: var(--muted); margin-top: 2px; }
+.bot-pnl  { font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; flex-shrink: 0; }
+.status-dot.live   { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.status-dot.paused { background: var(--red); }
+.status-dot.off    { background: var(--muted); }
+/* BIG PNL */
+.big-pnl { font-size: 32px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.big-pnl.pos { color: var(--green); }
+.big-pnl.neg { color: var(--red); }
+.big-pnl.zero { color: var(--text); }
+/* STAT GRID */
+.sgrid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+.sgrid2 { display: grid; grid-template-columns: repeat(2,1fr); gap: 8px; }
+.sitem { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; text-align: center; }
+.slabel { font-size: 9px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
+.sval { font-size: 16px; font-weight: 700; margin-top: 2px; font-variant-numeric: tabular-nums; }
+/* PROGRESS BAR */
+.pbar { height: 3px; background: var(--border); border-radius: 3px; overflow: hidden; margin: 6px 0; }
+.pfill { height: 100%; border-radius: 3px; transition: width .5s; }
+.pfill.green { background: linear-gradient(90deg, var(--accent), var(--green)); }
+.pfill.red   { background: var(--red); }
+.pfill.orb   { background: linear-gradient(90deg, var(--orb), var(--accent)); }
+/* ORB RANGE */
+.orb-range {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--bg); border: 1px solid rgba(179,136,255,.3);
+  border-radius: 8px; padding: 10px 12px; margin-bottom: 8px;
+}
+.orb-val { font-size: 18px; font-weight: 700; color: var(--orb); font-variant-numeric: tabular-nums; }
+.orb-label { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+.orb-size { font-size: 13px; color: var(--orb); font-weight: 700; }
+/* FVG STATE */
+.fvg-state {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--bg); border-radius: 8px; padding: 10px 12px; margin-bottom: 8px;
+}
+.fvg-icon { font-size: 20px; }
+.fvg-text { font-size: 12px; }
+.fvg-sub  { font-size: 10px; color: var(--muted); margin-top: 2px; }
+/* LEVELS */
+.lvl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.lvl-item { display: flex; align-items: center; gap: 8px; padding: 7px 10px; background: var(--bg); border: 1px solid var(--border); border-radius: 7px; }
+.lvl-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.lvl-name { font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: .07em; width: 38px; }
+.lvl-val { font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
+/* PAYOUT */
+.payout-circles { display: flex; gap: 6px; margin-bottom: 8px; }
+.pcircle {
+  width: 26px; height: 26px; border-radius: 50%;
+  border: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; color: var(--muted);
+}
+.pcircle.done { background: var(--green); border-color: var(--green); color: #000; }
+.pcircle.next { border-color: var(--accent); color: var(--accent); }
+/* BUTTONS */
+.btn { width: 100%; padding: 11px; border-radius: 8px; border: none; font-size: 13px; font-weight: 700; cursor: pointer; margin-bottom: 8px; transition: all .15s; }
+.btn-primary { background: var(--accent); color: #000; }
+.btn-outline { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+.btn-orb    { background: transparent; color: var(--orb); border: 1px solid var(--orb); }
+.btn-danger { background: transparent; color: var(--red); border: 1px solid rgba(255,23,68,.3); font-size: 12px; padding: 9px; }
+.btn:active { opacity: .75; transform: scale(.98); }
+.btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+.btn-row .btn { margin-bottom: 0; }
+/* PHASE BADGE */
+.phase {
+  display: inline-block; font-size: 9px; font-weight: 700; letter-spacing: .08em;
+  padding: 3px 8px; border-radius: 20px; text-transform: uppercase;
+}
+.phase.building { background: rgba(255,214,0,.12); color: var(--yellow); border: 1px solid rgba(255,214,0,.3); }
+.phase.trading  { background: rgba(0,230,118,.12); color: var(--green); border: 1px solid rgba(0,230,118,.3); }
+.phase.closed   { background: rgba(61,69,96,.2);  color: var(--muted); border: 1px solid var(--border); }
+.phase.done     { background: rgba(179,136,255,.12); color: var(--orb); border: 1px solid rgba(179,136,255,.3); }
+/* TOAST */
+.toast {
+  position: fixed; bottom: 82px; left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; padding: 9px 16px; font-size: 13px; font-weight: 600;
+  opacity: 0; transition: all .3s; pointer-events: none; white-space: nowrap; z-index: 999;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast.ok  { border-color: var(--green); color: var(--green); }
+.toast.err { border-color: var(--red);   color: var(--red); }
+/* NAV */
+.nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: var(--surface); border-top: 1px solid var(--border);
+  display: flex; z-index: 100;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.nitem { flex: 1; padding: 9px 4px 7px; text-align: center; cursor: pointer; color: var(--muted); transition: color .2s; }
+.nitem.on { color: var(--accent); }
+.nico { font-size: 19px; }
+.nlbl { font-size: 9px; font-weight: 700; letter-spacing: .06em; margin-top: 2px; text-transform: uppercase; }
+.div { height: 1px; background: var(--border); margin: 12px 0; }
+.empty { text-align: center; padding: 20px; color: var(--muted); font-size: 13px; }
+.tuner-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--border); }
+.tuner-row:last-child { border-bottom: none; }
+.tuner-label { font-size: 12px; color: var(--muted); }
+.tuner-val { font-size: 12px; font-weight: 700; }
+</style>
+</head>
+<body>
 
-**Step 1 — Create GitHub repo**
-Go to github.com/new → name it `alphagrid-agent` → Private → Create
+<div class="hdr">
+  <div class="logo">ALPHA<span>GRID</span></div>
+  <div class="time" id="clock">--:-- ET</div>
+</div>
 
-**Step 2 — Upload files**
-Upload all 4 files, rename them:
-- `agent_server.py` → `agent_server.py`
-- `agent_Procfile` → `Procfile`
-- `agent_requirements.txt` → `requirements.txt`
-- `agent_runtime.txt` → `runtime.txt`
+<div class="tabs">
+  <div class="tab on" onclick="nav('overview')">OVERVIEW</div>
+  <div class="tab" onclick="nav('fvg')">🧠 FVG</div>
+  <div class="tab" onclick="nav('orb')">🏛️ ORB</div>
+  <div class="tab" onclick="nav('levels')">LEVELS</div>
+  <div class="tab" onclick="nav('reports')">REPORTS</div>
+</div>
 
-**Step 3 — Create Railway service**
-Railway → New Service → GitHub Repo → `alphagrid-agent`
+<!-- ── OVERVIEW ── -->
+<div class="panel on" id="tab-overview">
 
-**Step 4 — Add env vars:**
+  <!-- Combined P&L -->
+  <div class="card">
+    <div class="ctitle">Combined Account P&L</div>
+    <div class="big-pnl zero" id="combinedPnl">$0.00</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px" id="combinedSub">Loading...</div>
+  </div>
 
-| Variable | Value |
-|---|---|
-| `TELEGRAM_BOT_TOKEN` | Your agent's Telegram token (new bot or existing) |
-| `TELEGRAM_CHAT_ID` | `6627974019` |
-| `ALLNIGHT_URL` | `https://alphagrid-allnight-production.up.railway.app` |
-| `ORB_URL` | `https://web-production-d58a3.up.railway.app` |
-| `KILLZONE_URL` | `https://web-production-1759f.up.railway.app` |
+  <!-- All 3 bots status -->
+  <div class="card">
+    <div class="ctitle">Bot Status</div>
 
-**What it does from day 1:**
+    <div class="bot-row">
+      <div style="display:flex;align-items:center">
+        <div class="status-dot live" id="dot-fvg"></div>
+        <div>
+          <div class="bot-name">🧠 All Night (FVG)</div>
+          <div class="bot-sub" id="sub-fvg">Loading...</div>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div class="bot-pnl" id="pnl-fvg">$0</div>
+        <div style="font-size:10px;color:var(--muted)" id="wr-fvg">—</div>
+      </div>
+    </div>
 
-| Time ET | Action |
-|---|---|
-| 7:45 AM | 🤖 Morning report — Go/No-Go, regime, news, all 3 bot statuses |
-| Every 30 mins 7AM–5PM | Silent health check — alerts you if any bot goes offline |
-| 9:00 PM | 🌙 Nightly report — cross-bot P&L, best strategy, sizing rec |
+    <div class="bot-row">
+      <div style="display:flex;align-items:center">
+        <div class="status-dot live" id="dot-orb"></div>
+        <div>
+          <div class="bot-name">🏛️ ORB Bot</div>
+          <div class="bot-sub" id="sub-orb">Loading...</div>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div class="bot-pnl" id="pnl-orb">$0</div>
+        <div style="font-size:10px;color:var(--muted)" id="wr-orb">—</div>
+      </div>
+    </div>
 
-As trade data accumulates, the regime analysis and sizing recommendations get sharper. Phase 2 self-modification layer plugs straight into this when you're ready.
+    <div class="bot-row">
+      <div style="display:flex;align-items:center">
+        <div class="status-dot live" id="dot-kz"></div>
+        <div>
+          <div class="bot-name">⚡ Kill Zone Bot</div>
+          <div class="bot-sub" id="sub-kz">NY KZ 8–10:30 AM ET</div>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div class="bot-pnl" id="pnl-kz">$0</div>
+        <div style="font-size:10px;color:var(--muted)" id="wr-kz">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Account health -->
+  <div class="card">
+    <div class="ctitle">Account Health</div>
+    <div class="sgrid">
+      <div class="sitem">
+        <div class="slabel">Builder DD</div>
+        <div class="sval" id="fvg-dd" style="color:var(--green)">$2,000</div>
+      </div>
+      <div class="sitem">
+        <div class="slabel">$25K DD</div>
+        <div class="sval" id="orb-dd" style="color:var(--green)">$1,000</div>
+      </div>
+      <div class="sitem">
+        <div class="slabel">ORB Target</div>
+        <div class="sval" id="orb-target" style="color:var(--orb)">$1,500</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Builder payout progress -->
+  <div class="card">
+    <div class="ctitle">Builder → Live · Payout Progress</div>
+    <div class="payout-circles" id="payoutCircles"></div>
+    <div class="pbar"><div class="pfill green" id="payoutBar" style="width:0%"></div></div>
+    <div style="font-size:11px;color:var(--muted)" id="payoutSub">Loading...</div>
+  </div>
+
+</div>
+
+<!-- ── FVG BOT ── -->
+<div class="panel" id="tab-fvg">
+
+  <div class="card fvg-card">
+    <div class="ctitle"><span class="dot" style="background:var(--green)"></span>All Night Bot — FVG Sweep</div>
+    <div class="big-pnl zero" id="fvg-total-pnl">$0.00</div>
+    <div class="pbar"><div class="pfill green" id="fvg-draw-bar" style="width:100%"></div></div>
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:2px">
+      <span>Floor: <strong id="fvg-floor">-$2,000</strong></span>
+      <span>Room: <strong id="fvg-room">$2,000</strong></span>
+    </div>
+  </div>
+
+  <!-- FVG engine state -->
+  <div class="card">
+    <div class="ctitle">FVG Engine State</div>
+    <div class="fvg-state" id="fvgState">
+      <div class="fvg-icon">😴</div>
+      <div><div class="fvg-text">Watching for sweeps</div><div class="fvg-sub">No active sweep</div></div>
+    </div>
+    <div class="sgrid">
+      <div class="sitem">
+        <div class="slabel">Session</div>
+        <div class="sval" id="fvg-session" style="font-size:12px">—</div>
+      </div>
+      <div class="sitem">
+        <div class="slabel">1M Bars</div>
+        <div class="sval" id="fvg-bars">0</div>
+      </div>
+      <div class="sitem">
+        <div class="slabel">MES Price</div>
+        <div class="sval" id="fvg-price" style="font-size:12px">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="card">
+    <div class="ctitle">Performance</div>
+    <div class="sgrid">
+      <div class="sitem">
+        <div class="slabel">Win Rate</div>
+        <div class="sval" id="fvg-wr">—</div>
+      </div>
+      <div class="sitem">
+        <div class="slabel">Trades</div>
+        <div class="sval" id="fvg-trades">0</div>
+      </div>
+      <div class="sitem">
+        <div class="slabel">Mode</div>
+        <div class="sval" id="fvg-mode" style="color:var(--green);font-size:12px">NORMAL</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tuner -->
+  <div class="card">
+    <div class="ctitle">Self-Tuner</div>
+    <div class="tuner-row">
+      <div class="tuner-label">Cycle</div>
+      <div class="tuner-val" id="fvg-tune-cycle">#0</div>
+    </div>
+    <div class="tuner-row">
+      <div class="tuner-label">Next tune in</div>
+      <div class="tuner-val" id="fvg-tune-next">10 trades</div>
+    </div>
+    <div class="tuner-row">
+      <div class="tuner-label">MES Sweep Buffer</div>
+      <div class="tuner-val" id="fvg-buf">1.5pts</div>
+    </div>
+    <div class="tuner-row">
+      <div class="tuner-label">Asia Size</div>
+      <div class="tuner-val" id="fvg-size-asia">100%</div>
+    </div>
+    <div class="tuner-row">
+      <div class="tuner-label">London Size</div>
+      <div class="tuner-val" id="fvg-size-lon">100%</div>
+    </div>
+    <div class="tuner-row">
+      <div class="tuner-label">NY KZ Size</div>
+      <div class="tuner-val" id="fvg-size-ny">100%</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── ORB BOT ── -->
+<div class="panel" id="tab-orb">
+
+  <div class="card orb-card">
+    <div class="ctitle"><span class="dot" style="background:var(--orb)"></span>ORB Bot — Opening Range Breakout</div>
+    <div class="big-pnl zero" id="orb-total-pnl">$0.00</div>
+    <div class="pbar"><div class="pfill orb" id="orb-draw-bar" style="width:100%"></div></div>
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:2px">
+      <span>Floor: <strong id="orb-floor">-$1,000</strong></span>
+      <span>Room: <strong id="orb-room">$1,000</strong></span>
+    </div>
+  </div>
+
+  <!-- Phase + OR -->
+  <div class="card">
+    <div class="ctitle">Today's Opening Range</div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <div class="phase closed" id="orb-phase">CLOSED</div>
+      <div style="font-size:11px;color:var(--muted)" id="orb-bias-line">Bias: —</div>
+    </div>
+    <div class="orb-range">
+      <div>
+        <div class="orb-label">OR High</div>
+        <div class="orb-val" id="orb-high">—</div>
+      </div>
+      <div style="text-align:center">
+        <div class="orb-label">Size</div>
+        <div class="orb-size" id="orb-size">—</div>
+      </div>
+      <div style="text-align:right">
+        <div class="orb-label">OR Low</div>
+        <div class="orb-val" id="orb-low">—</div>
+      </div>
+    </div>
+    <div class="sgrid2" style="margin-top:8px">
+      <div class="sitem">
+        <div class="slabel">BUY Trigger</div>
+        <div class="sval" id="orb-buy-trig" style="color:var(--green);font-size:13px">—</div>
+      </div>
+      <div class="sitem">
+        <div class="slabel">SELL Trigger</div>
+        <div class="sval" id="orb-sell-trig" style="color:var(--red);font-size:13px">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Trade today -->
+  <div class="card">
+    <div class="ctitle">Today's Trade</div>
+    <div id="orb-trade-info" class="empty">No trade today yet</div>
+  </div>
+
+  <!-- Stats -->
+  <div class="card">
+    <div class="ctitle">Performance</div>
+    <div class="sgrid">
+      <div class="sitem">
+        <div class="slabel">Win Rate</div>
+        <div class="sval" id="orb-wr">—</div>
+      </div>
+      <div class="sitem">
+        <div class="slabel">Trades</div>
+        <div class="sval" id="orb-trades">0</div>
+      </div>
+      <div class="sitem">
+        <div class="slabel">To Target</div>
+        <div class="sval" id="orb-to-target" style="color:var(--orb);font-size:13px">$1,500</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ORB Tuner -->
+  <div class="card">
+    <div class="ctitle">Self-Tuner</div>
+    <div class="tuner-row">
+      <div class="tuner-label">Cycle</div>
+      <div class="tuner-val" id="orb-tune-cycle">#0</div>
+    </div>
+    <div class="tuner-row">
+      <div class="tuner-label">Next tune in</div>
+      <div class="tuner-val" id="orb-tune-next">10 trades</div>
+    </div>
+    <div class="tuner-row">
+      <div class="tuner-label">TP Multiplier</div>
+      <div class="tuner-val" id="orb-tp-mult">1.5×</div>
+    </div>
+    <div class="tuner-row">
+      <div class="tuner-label">Direction Bias</div>
+      <div class="tuner-val" id="orb-dir-bias">BOTH</div>
+    </div>
+    <div class="tuner-row">
+      <div class="tuner-label">Trade Window</div>
+      <div class="tuner-val" id="orb-window">9:30 ET</div>
+    </div>
+    <div class="tuner-row">
+      <div class="tuner-label">Min OR Size</div>
+      <div class="tuner-val" id="orb-min-or">3pts</div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="card">
+    <div class="ctitle">Today's Filters</div>
+    <div class="sgrid2">
+      <div class="sitem">
+        <div class="slabel">Gap Skip</div>
+        <div class="sval" id="orb-gap-skip" style="font-size:13px">—</div>
+      </div>
+      <div class="sitem">
+        <div class="slabel">OR Skip</div>
+        <div class="sval" id="orb-or-skip" style="font-size:13px">—</div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--muted);margin-top:8px" id="orb-prior-close">Prior close: —</div>
+  </div>
+
+</div>
+
+<!-- ── LEVELS ── -->
+<div class="panel" id="tab-levels">
+
+  <div class="card">
+    <div class="ctitle">Auto-Set Levels · MES (All Night Bot)</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:10px">Auto-pushed by TradingView Pine alerts nightly.</div>
+    <div class="lvl-grid" id="lvlGrid">
+      <div class="empty" style="grid-column:1/-1">Loading…</div>
+    </div>
+  </div>
+
+  <div class="div"></div>
+  <div style="font-size:11px;color:var(--muted);margin-bottom:10px;text-align:center">Manual override — only if Pine alert missed</div>
+
+  <div class="card">
+    <div class="ctitle">Push Levels · MES</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+      <div><div style="font-size:9px;color:var(--pdh);font-weight:700;margin-bottom:4px">PDH</div><input id="oPDH" type="number" step="0.25" placeholder="0.00" style="width:100%;background:var(--bg);border:1px solid var(--border);border-left:2px solid var(--pdh);border-radius:6px;padding:8px;color:var(--text);font-size:13px;font-weight:700;outline:none"></div>
+      <div><div style="font-size:9px;color:var(--pdh);font-weight:700;margin-bottom:4px">PDL</div><input id="oPDL" type="number" step="0.25" placeholder="0.00" style="width:100%;background:var(--bg);border:1px solid var(--border);border-left:2px solid var(--pdh);border-radius:6px;padding:8px;color:var(--text);font-size:13px;font-weight:700;outline:none"></div>
+      <div><div style="font-size:9px;color:var(--asia);font-weight:700;margin-bottom:4px">Asia H</div><input id="oAsiaH" type="number" step="0.25" placeholder="0.00" style="width:100%;background:var(--bg);border:1px solid var(--border);border-left:2px solid var(--asia);border-radius:6px;padding:8px;color:var(--text);font-size:13px;font-weight:700;outline:none"></div>
+      <div><div style="font-size:9px;color:var(--asia);font-weight:700;margin-bottom:4px">Asia L</div><input id="oAsiaL" type="number" step="0.25" placeholder="0.00" style="width:100%;background:var(--bg);border:1px solid var(--border);border-left:2px solid var(--asia);border-radius:6px;padding:8px;color:var(--text);font-size:13px;font-weight:700;outline:none"></div>
+      <div><div style="font-size:9px;color:var(--lon);font-weight:700;margin-bottom:4px">Lon H</div><input id="oLonH" type="number" step="0.25" placeholder="0.00" style="width:100%;background:var(--bg);border:1px solid var(--border);border-left:2px solid var(--lon);border-radius:6px;padding:8px;color:var(--text);font-size:13px;font-weight:700;outline:none"></div>
+      <div><div style="font-size:9px;color:var(--lon);font-weight:700;margin-bottom:4px">Lon L</div><input id="oLonL" type="number" step="0.25" placeholder="0.00" style="width:100%;background:var(--bg);border:1px solid var(--border);border-left:2px solid var(--lon);border-radius:6px;padding:8px;color:var(--text);font-size:13px;font-weight:700;outline:none"></div>
+    </div>
+    <button class="btn btn-primary" onclick="pushLevels()">Push to All Night Bot</button>
+  </div>
+
+  <div class="card">
+    <div class="ctitle">Set Prior Close · ORB Bot</div>
+    <div style="margin-bottom:10px">
+      <div style="font-size:9px;color:var(--orb);font-weight:700;margin-bottom:4px">ES Prior Close</div>
+      <input id="oPriorClose" type="number" step="0.25" placeholder="0.00" style="width:100%;background:var(--bg);border:1px solid var(--border);border-left:2px solid var(--orb);border-radius:6px;padding:8px;color:var(--text);font-size:13px;font-weight:700;outline:none">
+    </div>
+    <button class="btn btn-orb" onclick="pushPriorClose()">Push Prior Close to ORB Bot</button>
+  </div>
+
+</div>
+
+<!-- ── REPORTS ── -->
+<div class="panel" id="tab-reports">
+
+  <div class="card">
+    <div class="ctitle">🧠 All Night Bot Reports</div>
+    <button class="btn btn-outline" onclick="trigReport('allnight','now')">📬 Morning + Pre-Session</button>
+    <button class="btn btn-outline" onclick="trigReport('allnight','eod')">🟢 EOD Report</button>
+    <button class="btn btn-outline" onclick="trigReport('allnight','weekly')">📊 Weekly Report</button>
+  </div>
+
+  <div class="card">
+    <div class="ctitle">🏛️ ORB Bot Reports</div>
+    <button class="btn btn-orb" onclick="trigReport('orb','now')">📬 Pre-Market Brief</button>
+    <button class="btn btn-orb" onclick="trigReport('orb','eod')">🟢 EOD Report</button>
+  </div>
+
+  <div class="card">
+    <div class="ctitle">Quick Links</div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <a href="https://alphagrid-allnight-production.up.railway.app/health" target="_blank" style="color:var(--green);font-size:13px;text-decoration:none">🧠 All Night /health</a>
+      <a href="https://web-production-d58a3.up.railway.app/health" target="_blank" style="color:var(--orb);font-size:13px;text-decoration:none">🏛️ ORB /health</a>
+      <a href="https://web-production-1759f.up.railway.app/health" target="_blank" style="color:var(--yellow);font-size:13px;text-decoration:none">⚡ Kill Zone /health</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle">Report Schedule</div>
+    <div style="display:flex;flex-direction:column;gap:8px;font-size:12px">
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Morning Report</span><span>3:00 AM PT</span></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">ORB Pre-Market</span><span>4:55 AM PT</span></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">EOD Reports</span><span>1:30 PM PT</span></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Weekly Report</span><span>Sunday 5:00 AM PT</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle">Danger Zone</div>
+    <button class="btn btn-danger" onclick="resetBot('allnight')">Reset All Night Stats</button>
+    <button class="btn btn-danger" onclick="resetBot('orb')">Reset ORB Stats</button>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="nav">
+  <div class="nitem on"  onclick="nav('overview')"><div class="nico">📊</div><div class="nlbl">Overview</div></div>
+  <div class="nitem"     onclick="nav('fvg')"><div class="nico">🧠</div><div class="nlbl">FVG</div></div>
+  <div class="nitem"     onclick="nav('orb')"><div class="nico">🏛️</div><div class="nlbl">ORB</div></div>
+  <div class="nitem"     onclick="nav('levels')"><div class="nico">📐</div><div class="nlbl">Levels</div></div>
+  <div class="nitem"     onclick="nav('reports')"><div class="nico">📬</div><div class="nlbl">Reports</div></div>
+</div>
+
+<script>
+const BOTS = {
+  allnight: 'https://alphagrid-allnight-production.up.railway.app',
+  orb:      'https://web-production-d58a3.up.railway.app',
+  kz:       'https://web-production-1759f.up.railway.app',
+};
+
+// ── CLOCK ────────────────────────────────────────────────────────────────────
+function updateClock() {
+  const et = new Date().toLocaleString('en-US', { timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit', hour12: false });
+  document.getElementById('clock').textContent = et + ' ET';
+}
+updateClock();
+setInterval(updateClock, 10000);
+
+// ── NAV ──────────────────────────────────────────────────────────────────────
+function nav(name) {
+  const tabs = ['overview','fvg','orb','levels','reports'];
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('on', tabs[i] === name));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('on'));
+  document.getElementById('tab-' + name).classList.add('on');
+  document.querySelectorAll('.nitem').forEach((n,i) => n.classList.toggle('on', tabs[i] === name));
+  if (name === 'levels') loadLevels();
+}
+
+// ── FETCH ALL ─────────────────────────────────────────────────────────────────
+async function fetchAll() {
+  const [fvg, orb, kz] = await Promise.allSettled([
+    fetch(BOTS.allnight + '/health').then(r => r.json()),
+    fetch(BOTS.orb + '/health').then(r => r.json()),
+    fetch(BOTS.kz + '/health').then(r => r.json()),
+  ]);
+
+  const fd = fvg.status === 'fulfilled' ? fvg.value : null;
+  const od = orb.status === 'fulfilled' ? orb.value : null;
+  const kd = kz.status  === 'fulfilled' ? kz.value  : null;
+
+  updateFVG(fd);
+  updateORB(od);
+  updateKZ(kd);
+  updateOverview(fd, od, kd);
+}
+
+// ── OVERVIEW ─────────────────────────────────────────────────────────────────
+function updateOverview(fd, od, kd) {
+  let combined = 0;
+  if (fd) combined += fd.total_pnl || 0;
+  if (od) combined += od.total_pnl || 0;
+
+  const el = document.getElementById('combinedPnl');
+  el.textContent = '$' + combined.toFixed(2);
+  el.className = 'big-pnl ' + (combined > 0 ? 'pos' : combined < 0 ? 'neg' : 'zero');
+  document.getElementById('combinedSub').textContent =
+    'All Night + ORB combined';
+
+  // FVG row
+  if (fd) {
+    const live = fd.trading;
+    document.getElementById('dot-fvg').className = 'status-dot ' + (live ? 'live' : 'paused');
+    document.getElementById('pnl-fvg').textContent = '$' + (fd.total_pnl||0).toFixed(0);
+    document.getElementById('pnl-fvg').style.color = (fd.total_pnl||0) >= 0 ? 'var(--green)' : 'var(--red)';
+    document.getElementById('sub-fvg').textContent = (fd.session || 'OFF') + ' | ' + (live ? 'LIVE' : 'PAUSED');
+    document.getElementById('wr-fvg').textContent = fd.total_trades ? fd.win_rate + '% WR' : '—';
+    document.getElementById('fvg-dd').textContent = '$' + (fd.drawdown_remaining||0).toFixed(0);
+    document.getElementById('fvg-dd').style.color = (fd.drawdown_remaining||0) < 500 ? 'var(--red)' : 'var(--green)';
+  }
+
+  // ORB row
+  if (od) {
+    const live = od.trading;
+    document.getElementById('dot-orb').className = 'status-dot ' + (live ? 'live' : 'paused');
+    document.getElementById('pnl-orb').textContent = '$' + (od.total_pnl||0).toFixed(0);
+    document.getElementById('pnl-orb').style.color = (od.total_pnl||0) >= 0 ? 'var(--orb)' : 'var(--red)';
+    document.getElementById('sub-orb').textContent = (od.phase||'—') + ' | ' + (live ? 'ARMED' : 'PAUSED');
+    document.getElementById('wr-orb').textContent = od.total_trades ? od.win_rate + '% WR' : '—';
+    document.getElementById('orb-dd').textContent = '$' + (od.drawdown_remaining||0).toFixed(0);
+    document.getElementById('orb-dd').style.color = (od.drawdown_remaining||0) < 300 ? 'var(--red)' : 'var(--green)';
+    document.getElementById('orb-target').textContent = '$' + (od.to_target||0).toFixed(0);
+  }
+
+  // KZ row
+  if (kd) {
+    const live = kd.can_trade;
+    document.getElementById('dot-kz').className = 'status-dot ' + (live ? 'live' : 'paused');
+    document.getElementById('pnl-kz').textContent = '$' + (kd.total_pnl||0).toFixed(0);
+    document.getElementById('pnl-kz').style.color = (kd.total_pnl||0) >= 0 ? 'var(--yellow)' : 'var(--red)';
+    document.getElementById('sub-kz').textContent = 'NY KZ | ' + (live ? 'LIVE' : 'PAUSED');
+    document.getElementById('wr-kz').textContent = kd.trades ? Math.round(kd.wins/kd.trades*100) + '% WR' : '—';
+  }
+
+  // Payout circles
+  if (fd) {
+    const pays = fd.payout_count || 0;
+    const circles = document.getElementById('payoutCircles');
+    circles.innerHTML = '';
+    for (let i = 1; i <= 5; i++) {
+      const c = document.createElement('div');
+      c.className = 'pcircle' + (i <= pays ? ' done' : i === pays+1 ? ' next' : '');
+      c.textContent = i <= pays ? '✓' : i;
+      circles.appendChild(c);
+    }
+    document.getElementById('payoutBar').style.width = (pays/5*100) + '%';
+    const toPay = fd.to_payout || 0;
+    document.getElementById('payoutSub').textContent =
+      toPay > 0 ? `$${toPay.toFixed(0)} to next payout` : '💰 PAYOUT ELIGIBLE!';
+  }
+}
+
+// ── FVG BOT ───────────────────────────────────────────────────────────────────
+function updateFVG(d) {
+  if (!d) return;
+  const pnl = d.total_pnl || 0;
+  const el = document.getElementById('fvg-total-pnl');
+  el.textContent = '$' + pnl.toFixed(2);
+  el.className = 'big-pnl ' + (pnl > 0 ? 'pos' : pnl < 0 ? 'neg' : 'zero');
+
+  const room = d.drawdown_remaining || 0;
+  const pct  = Math.max(0, Math.min(100, room/2000*100));
+  document.getElementById('fvg-draw-bar').style.width = pct + '%';
+  document.getElementById('fvg-draw-bar').className = 'pfill ' + (pct < 30 ? 'red' : 'green');
+  document.getElementById('fvg-floor').textContent = '$' + (d.trailing_floor||0).toFixed(0);
+  document.getElementById('fvg-room').textContent  = '$' + room.toFixed(0);
+
+  document.getElementById('fvg-session').textContent = d.session || 'OFF';
+  document.getElementById('fvg-wr').textContent = d.total_trades ? d.win_rate + '%' : '—';
+  document.getElementById('fvg-trades').textContent = d.total_trades || 0;
+  document.getElementById('fvg-mode').textContent = d.tight_mode ? 'TIGHT' : 'NORMAL';
+  document.getElementById('fvg-mode').style.color = d.tight_mode ? 'var(--yellow)' : 'var(--green)';
+
+  // FVG state
+  const fvg = d.fvg?.MES || {};
+  const fvgEl = document.getElementById('fvgState');
+  if (fvg.fvg_detected) {
+    fvgEl.innerHTML = `<div class="fvg-icon">🎯</div><div><div class="fvg-text" style="color:var(--green)">FVG Detected — Waiting for retest</div><div class="fvg-sub">Zone: ${fvg.fvg_low?.toFixed(2)} – ${fvg.fvg_high?.toFixed(2)}</div></div>`;
+  } else if (fvg.sweep_active) {
+    fvgEl.innerHTML = `<div class="fvg-icon">👁️</div><div><div class="fvg-text" style="color:var(--yellow)">Sweep Active — Watching for FVG</div><div class="fvg-sub">${fvg.sweep_direction} sweep at ${fvg.sweep_level}</div></div>`;
+  } else {
+    fvgEl.innerHTML = `<div class="fvg-icon">😴</div><div><div class="fvg-text">Watching for sweeps</div><div class="fvg-sub">No active sweep</div></div>`;
+  }
+  document.getElementById('fvg-bars').textContent = fvg.bars_buffered || 0;
+
+  if (d.prices?.MES) {
+    document.getElementById('fvg-price').textContent = d.prices.MES.toLocaleString('en-US', {minimumFractionDigits:2,maximumFractionDigits:2});
+  }
+
+  // Tuner
+  const t = d.tuner || {};
+  document.getElementById('fvg-tune-cycle').textContent = '#' + (t.tune_count||0);
+  document.getElementById('fvg-tune-next').textContent  = (t.next_tune_in||10) + ' trades';
+  document.getElementById('fvg-buf').textContent = (t.sweep_buf?.MES?.normal||1.5) + 'pts';
+  document.getElementById('fvg-size-asia').textContent = Math.round((t.session_multiplier?.Asia||1)*100) + '%';
+  document.getElementById('fvg-size-lon').textContent  = Math.round((t.session_multiplier?.London||1)*100) + '%';
+  document.getElementById('fvg-size-ny').textContent   = Math.round((t.session_multiplier?.NY_KZ||1)*100) + '%';
+}
+
+// ── ORB BOT ───────────────────────────────────────────────────────────────────
+function updateORB(d) {
+  if (!d) return;
+  const pnl = d.total_pnl || 0;
+  const el = document.getElementById('orb-total-pnl');
+  el.textContent = '$' + pnl.toFixed(2);
+  el.className = 'big-pnl ' + (pnl > 0 ? 'pos' : pnl < 0 ? 'neg' : 'zero');
+
+  const room = d.drawdown_remaining || 0;
+  const pct  = Math.max(0, Math.min(100, room/1000*100));
+  document.getElementById('orb-draw-bar').style.width = pct + '%';
+  document.getElementById('orb-draw-bar').className = 'pfill ' + (pct < 30 ? 'red' : 'orb');
+  document.getElementById('orb-floor').textContent = '$' + (d.trailing_floor||0).toFixed(0);
+  document.getElementById('orb-room').textContent  = '$' + room.toFixed(0);
+
+  // Phase
+  const phase = (d.phase||'CLOSED').toUpperCase();
+  const phEl = document.getElementById('orb-phase');
+  phEl.textContent = phase;
+  phEl.className = 'phase ' + (phase === 'BUILDING_OR' ? 'building' : phase === 'TRADING' ? 'trading' : phase === 'TRADED' ? 'done' : 'closed');
+
+  // OR levels
+  const orb = d.orb || {};
+  document.getElementById('orb-high').textContent = orb.or_high?.toFixed(2) || '—';
+  document.getElementById('orb-low').textContent  = orb.or_low?.toFixed(2)  || '—';
+  document.getElementById('orb-size').textContent = orb.or_size ? orb.or_size.toFixed(1) + 'pts' : '—';
+  document.getElementById('orb-bias-line').textContent = 'Bias: ' + (orb.bias || '—') + ' | Prior close: ' + (orb.prior_close?.toFixed(2) || '—');
+  document.getElementById('orb-buy-trig').textContent  = orb.breakout_high?.toFixed(2) || '—';
+  document.getElementById('orb-sell-trig').textContent = orb.breakout_low?.toFixed(2)  || '—';
+
+  // Trade today
+  const tradeEl = document.getElementById('orb-trade-info');
+  if (orb.traded_today) {
+    tradeEl.innerHTML = `<div style="text-align:center;padding:10px"><div style="font-size:13px;font-weight:700;color:var(--orb)">${orb.trade_dir} fired today</div></div>`;
+  } else {
+    tradeEl.innerHTML = '<div class="empty">No trade today yet</div>';
+  }
+
+  // Filters
+  document.getElementById('orb-gap-skip').textContent = orb.gap_skip ? '🚫 YES' : '✅ NO';
+  document.getElementById('orb-gap-skip').style.color = orb.gap_skip ? 'var(--red)' : 'var(--green)';
+  document.getElementById('orb-or-skip').textContent  = orb.or_skip  ? '🚫 YES' : '✅ NO';
+  document.getElementById('orb-or-skip').style.color  = orb.or_skip  ? 'var(--red)' : 'var(--green)';
+  document.getElementById('orb-prior-close').textContent = 'Prior close: ' + (orb.prior_close?.toFixed(2) || 'Not set — set via /set-prior-close');
+
+  // Stats
+  document.getElementById('orb-wr').textContent = d.total_trades ? d.win_rate + '%' : '—';
+  document.getElementById('orb-trades').textContent = d.total_trades || 0;
+  document.getElementById('orb-to-target').textContent = '$' + (d.to_target||1500).toFixed(0);
+
+  // Tuner
+  const t = d.tuner || {};
+  document.getElementById('orb-tune-cycle').textContent = '#' + (t.tune_count||0);
+  document.getElementById('orb-tune-next').textContent  = (t.next_tune_in||10) + ' trades';
+  document.getElementById('orb-tp-mult').textContent = (t.tp_multiplier||1.5) + '×';
+  document.getElementById('orb-dir-bias').textContent = t.direction_bias || 'BOTH';
+  document.getElementById('orb-window').textContent = t.trade_window_end || '9:30 ET';
+  document.getElementById('orb-min-or').textContent = (t.min_or_size||3) + 'pts';
+}
+
+// ── KZ BOT ────────────────────────────────────────────────────────────────────
+function updateKZ(d) {
+  if (!d) return;
+  // Just update overview — KZ doesn't have its own tab
+}
+
+// ── LEVELS ────────────────────────────────────────────────────────────────────
+async function loadLevels() {
+  try {
+    const r = await fetch(BOTS.allnight + '/health');
+    const d = await r.json();
+    const lvls = d.levels?.MES?.levels || {};
+    const upd  = d.levels?.MES?.last_updated || {};
+    const grid = document.getElementById('lvlGrid');
+    const items = [
+      ['PDH', lvls.PDH, 'var(--pdh)'],
+      ['PDL', lvls.PDL, 'var(--pdh)'],
+      ['AsiaH', lvls.AsiaH, 'var(--asia)'],
+      ['AsiaL', lvls.AsiaL, 'var(--asia)'],
+      ['LonH',  lvls.LonH,  'var(--lon)'],
+      ['LonL',  lvls.LonL,  'var(--lon)'],
+    ];
+    grid.innerHTML = items.map(([name, val, col]) => {
+      const src = upd[name]?.source || '';
+      return `<div class="lvl-item">
+        <div class="lvl-dot" style="background:${col}"></div>
+        <div class="lvl-name" style="color:${col}">${name}</div>
+        <div>
+          <div class="lvl-val">${val ? val.toLocaleString('en-US',{minimumFractionDigits:2}) : '—'}</div>
+          ${src ? `<div style="font-size:9px;color:var(--muted)">${src}</div>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) {}
+}
+
+async function pushLevels() {
+  const payload = { inst: 'MES' };
+  const fields = { PDH:'oPDH', PDL:'oPDL', AsiaH:'oAsiaH', AsiaL:'oAsiaL', LonH:'oLonH', LonL:'oLonL' };
+  let any = false;
+  for (const [k, id] of Object.entries(fields)) {
+    const v = parseFloat(document.getElementById(id).value);
+    if (v) { payload[k] = v; any = true; }
+  }
+  if (!any) { toast('No values entered', 'err'); return; }
+  try {
+    const r = await fetch(BOTS.allnight + '/levels', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
+    if (r.ok) { toast('✅ Levels pushed', 'ok'); loadLevels(); }
+    else toast('❌ Failed', 'err');
+  } catch(e) { toast('❌ Error', 'err'); }
+}
+
+async function pushPriorClose() {
+  const v = parseFloat(document.getElementById('oPriorClose').value);
+  if (!v) { toast('Enter prior close', 'err'); return; }
+  try {
+    const r = await fetch(BOTS.orb + '/set-prior-close', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({close:v}) });
+    if (r.ok) toast('✅ Prior close set', 'ok');
+    else toast('❌ Failed', 'err');
+  } catch(e) { toast('❌ Error', 'err'); }
+}
+
+// ── REPORTS ───────────────────────────────────────────────────────────────────
+async function trigReport(bot, type) {
+  const url = BOTS[bot] + '/report/' + type;
+  try {
+    const r = await fetch(url, { method:'POST' });
+    if (r.ok) toast('📬 Sent to Telegram', 'ok');
+    else toast('❌ Failed', 'err');
+  } catch(e) { toast('❌ Error', 'err'); }
+}
+
+async function resetBot(bot) {
+  if (!confirm('Reset ' + bot + ' stats?')) return;
+  const url = BOTS[bot] + (bot === 'allnight' ? '/reset_stats' : '/reset-day');
+  const r = await fetch(url, { method:'POST' });
+  if (r.ok) { toast('Reset done', 'ok'); fetchAll(); }
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+let toastT;
+function toast(msg, type='ok') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show ' + type;
+  clearTimeout(toastT);
+  toastT = setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+fetchAll();
+setInterval(fetchAll, 15000);
+</script>
+</body>
+</html>
