@@ -254,6 +254,38 @@ body {
     </div>
   </div>
 
+  <!-- Market Intelligence (Agent) -->
+  <div class="card" id="marketCard" style="margin-bottom:12px">
+    <div class="ctitle"><span class="dot" style="background:var(--accent)"></span>Market Intelligence</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+      <div>
+        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">Go/No-Go</div>
+        <div id="ag-verdict" style="font-size:14px;font-weight:700;margin-top:2px">—</div>
+      </div>
+      <div>
+        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">VIX</div>
+        <div id="ag-vix" style="font-size:13px;font-weight:600;margin-top:2px;color:var(--text)">—</div>
+      </div>
+      <div>
+        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">ES Regime</div>
+        <div id="ag-es-regime" style="font-size:13px;font-weight:600;margin-top:2px">—</div>
+      </div>
+      <div>
+        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">NQ Regime</div>
+        <div id="ag-nq-regime" style="font-size:13px;font-weight:600;margin-top:2px">—</div>
+      </div>
+      <div>
+        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">ES ADR20</div>
+        <div id="ag-es-adr" style="font-size:13px;font-weight:600;margin-top:2px;color:var(--green)">—</div>
+      </div>
+      <div>
+        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">ES Today</div>
+        <div id="ag-es-pct" style="font-size:13px;font-weight:600;margin-top:2px">—</div>
+      </div>
+    </div>
+    <div id="ag-divergence" style="margin-top:8px;font-size:11px;color:var(--muted)">—</div>
+  </div>
+
   <!-- Account health -->
   <div class="card">
     <div class="ctitle">Account Health</div>
@@ -583,6 +615,7 @@ const BOTS = {
   allnight: 'https://alphagrid-allnight-production.up.railway.app',
   orb:      'https://web-production-d58a3.up.railway.app',
   kz:       'https://web-production-1759f.up.railway.app',
+  agent:    'https://web-production-aaf862.up.railway.app',
 };
 
 // ── CLOCK ────────────────────────────────────────────────────────────────────
@@ -605,24 +638,67 @@ function nav(name) {
 
 // ── FETCH ALL ─────────────────────────────────────────────────────────────────
 async function fetchAll() {
-  const [fvg, orb, kz] = await Promise.allSettled([
+  const [fvg, orb, kz, agent] = await Promise.allSettled([
     fetch(BOTS.allnight + '/health').then(r => r.json()),
     fetch(BOTS.orb + '/health').then(r => r.json()),
     fetch(BOTS.kz + '/health').then(r => r.json()),
+    fetch(BOTS.agent + '/health').then(r => r.json()),
   ]);
 
-  const fd = fvg.status === 'fulfilled' ? fvg.value : null;
-  const od = orb.status === 'fulfilled' ? orb.value : null;
-  const kd = kz.status  === 'fulfilled' ? kz.value  : null;
+  const fd = fvg.status   === 'fulfilled' ? fvg.value   : null;
+  const od = orb.status   === 'fulfilled' ? orb.value   : null;
+  const kd = kz.status    === 'fulfilled' ? kz.value    : null;
+  const ad = agent.status === 'fulfilled' ? agent.value : null;
 
   updateFVG(fd);
   updateORB(od);
   updateKZ(kd);
-  updateOverview(fd, od, kd);
+  updateOverview(fd, od, kd, ad);
 }
 
 // ── OVERVIEW ─────────────────────────────────────────────────────────────────
-function updateOverview(fd, od, kd) {
+function updateOverview(fd, od, kd, ad) {
+  // ── AGENT MARKET INTELLIGENCE ─────────────────────────────────────────────
+  if (ad && ad.market) {
+    const m  = ad.market;
+    const es = m.es || {};
+    const nq = m.nq || {};
+
+    // Go/No-Go
+    const go    = !m.divergence?.detected && es.adr_pct_used < 85;
+    const vdict = document.getElementById('ag-verdict');
+    vdict.textContent = go ? '🟢 GO' : '🔴 CAUTION';
+    vdict.style.color = go ? 'var(--green)' : 'var(--red)';
+
+    // VIX
+    document.getElementById('ag-vix').textContent = m.vix || '—';
+
+    // ES Regime
+    const esReg = document.getElementById('ag-es-regime');
+    esReg.textContent = es.regime || '—';
+    esReg.style.color = es.regime === 'UPTREND' ? 'var(--green)' : es.regime === 'DOWNTREND' ? 'var(--red)' : 'var(--yellow)';
+
+    // NQ Regime
+    const nqReg = document.getElementById('ag-nq-regime');
+    nqReg.textContent = nq.regime || '—';
+    nqReg.style.color = nq.regime === 'UPTREND' ? 'var(--green)' : nq.regime === 'DOWNTREND' ? 'var(--red)' : 'var(--yellow)';
+
+    // ADR
+    document.getElementById('ag-es-adr').textContent = es.adr_20day ? es.adr_20day + 'pts' : '—';
+
+    // Today pct used
+    const pctEl = document.getElementById('ag-es-pct');
+    const pct   = es.adr_pct_used || 0;
+    pctEl.textContent = pct.toFixed(0) + '% of ADR used';
+    pctEl.style.color = pct > 80 ? 'var(--red)' : pct > 50 ? 'var(--yellow)' : 'var(--green)';
+
+    // Divergence
+    const divEl = document.getElementById('ag-divergence');
+    divEl.textContent = m.divergence?.message || '—';
+    divEl.style.color = m.divergence?.detected ? 'var(--red)' : 'var(--muted)';
+  }
+
+
   let combined = 0;
   if (fd) combined += fd.total_pnl || 0;
   if (od) combined += od.total_pnl || 0;
@@ -752,7 +828,13 @@ function updateORB(d) {
   const phase = (d.phase||'CLOSED').toUpperCase();
   const phEl = document.getElementById('orb-phase');
   phEl.textContent = phase;
-  phEl.className = 'phase ' + (phase === 'BUILDING_OR' ? 'building' : phase === 'TRADING' ? 'trading' : phase === 'TRADED' ? 'done' : 'closed');
+  phEl.className = 'phase ' + (
+    phase === 'BUILDING_OR' ? 'building' :
+    phase === 'WINDOW_1'    ? 'trading'  :
+    phase === 'WINDOW_2'    ? 'trading'  :
+    phase === 'PRE_MARKET'  ? 'building' :
+    'closed'
+  );
 
   // OR levels
   const orb = d.orb || {};
